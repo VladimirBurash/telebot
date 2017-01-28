@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import config
 import telebot,datetime,aiohttp,asyncio
 
@@ -90,25 +89,26 @@ async def group_ages(message):
                     req = await resp.json()
                     if count-((i+1)*1000)>0:
                         con = 1000
+                        per = int(100*1000*(i+1)/count)
                     else:
                         con = 1000-abs(count-(i+1)*1000)
+                        per = 100
                     while j < con:
-                        bdate = req['response']['items'][j].get('bdate')
+                        bdate =  req['response']['items'][j].get('bdate')
                         if bdate:
                             if len(bdate) > 5:
                                 try:
                                     bdate = datetime.datetime.strptime(bdate, "%d.%m.%Y")
                                     bArr.insert(j, bdate)
-                                    # bot.send_message(message.chat.id,bdate)
                                 except:
                                     print("wrong")
                         j += 1
                 i += 1
                 offset += 1000
+                print("Выполнено: "+str(per)+"%")
             diag = [0 for i in range(120)]
             count1 = len(bArr)
             i = 0
-            a = []
             while i < count1:
                 result = (datetime.datetime.today() - bArr[i]) / 365
                 result = str(result).split(' ')
@@ -129,13 +129,8 @@ async def group_ages(message):
                 i += 1
             bot.send_message(message.chat.id,' '.join(answer))
 
-
-
-
-
-
 @bot.message_handler(commands=["friends_ages"])
-def loop(message):
+def friends(message):
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     # Blocking call which returns when the display_date() coroutine is done
@@ -151,4 +146,4 @@ def groups(message):
     loop.close()
 
 if __name__ == '__main__':
-    bot.polling()
+    bot.polling(none_stop=True)
